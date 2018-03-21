@@ -73,18 +73,7 @@ func ParseMovies(doc *goquery.Document) (movies []Movie) {
 
 		quote := s.Find(".quote .inq").Text()
 
-		movie := Movie{
-			Title:    title,
-			Subtitle: subtitle,
-			Other:    other,
-			Desc:     desc,
-			Year:     year,
-			Area:     area,
-			Tag:      tag,
-			Star:     star,
-			Comment:  comment,
-			Quote:    quote,
-		}
+		...
 
 		log.Printf("i: %d, movie: %v", i, movie)
 
