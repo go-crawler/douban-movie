@@ -30,7 +30,7 @@ type Page struct {
 
 // GetDoc 返回一个doc
 func GetDoc(url string) *goquery.Document {
-	//修改请求的头部，以欺骗豆瓣的简单防爬虫手段
+	//修改请求的头部，伪装成浏览器操作，否则会被豆瓣阻止访问
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36")
