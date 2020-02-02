@@ -2,6 +2,7 @@ package parse
 
 import (
 	"log"
+	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
@@ -27,20 +28,38 @@ type Page struct {
 	Url  string
 }
 
-// 获取分页
-func GetPages(url string) []Page {
-	doc, err := goquery.NewDocument(url)
+// GetDoc 返回一个doc
+func GetDoc(url string) *goquery.Document {
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36")
+
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
+	if resp.StatusCode != 200 {
+		log.Fatalf("status code error: %d %s", resp.StatusCode, resp.Status)
+	}
+	defer resp.Body.Close()
 
-	return ParsePages(doc)
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return doc
+}
+
+// GetPages 获取分页
+func GetPages(url string) []Page {
+	doc := GetDoc(url)
+	return parsePages(doc)
 }
 
 // 分析分页
-func ParsePages(doc *goquery.Document) (pages []Page) {
+func parsePages(doc *goquery.Document) (pages []Page) {
 	pages = append(pages, Page{Page: 1, Url: ""})
-	doc.Find("#content > div > div.article > div.paginator > a").Each(func(i int, s *goquery.Selection) {
+	doc.Find(".paginator > a").Each(func(i int, s *goquery.Selection) {
 		page, _ := strconv.Atoi(s.Text())
 		url, _ := s.Attr("href")
 
@@ -49,7 +68,6 @@ func ParsePages(doc *goquery.Document) (pages []Page) {
 			Url:  url,
 		})
 	})
-
 	return pages
 }
 
