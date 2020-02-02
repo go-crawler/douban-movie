@@ -3,12 +3,9 @@ package main
 
 import (
 	"log"
-	"strings"
 
-	"github.com/PuerkitoBio/goquery"
-
-	"github.com/go-crawler/douban-movie/model"
-	"github.com/go-crawler/douban-movie/parse"
+	"github.com/cnanl/douban-movie/model"
+	"github.com/cnanl/douban-movie/parse"
 )
 
 var (
@@ -19,7 +16,7 @@ var (
 func Add(movies []parse.DoubanMovie) {
 	for index, movie := range movies {
 		if err := model.DB.Create(&movie).Error; err != nil {
-			log.Printf("db.Create index: %s, err : %v", index, err)
+			log.Printf("db.Create index: %d, err : %v", index, err)
 		}
 	}
 }
@@ -30,15 +27,11 @@ func Start() {
 
 	pages := parse.GetPages(BaseUrl)
 	for _, page := range pages {
-		doc, err := goquery.NewDocument(strings.Join([]string{BaseUrl, page.Url}, ""))
-		if err != nil {
-			log.Println(err)
-		}
-
+		doc := parse.GetDoc(BaseUrl + page.Url)
 		movies = append(movies, parse.ParseMovies(doc)...)
 	}
-
 	Add(movies)
+
 }
 
 func main() {
