@@ -4,12 +4,12 @@ package main
 import (
 	"log"
 
-	"github.com/cnanl/douban-movie/model"
-	"github.com/cnanl/douban-movie/parse"
+	"douban-movie/model"
+	"douban-movie/parse"
 )
 
 var (
-	BaseUrl = "https://movie.douban.com/top250"
+	baseUrl = "https://movie.douban.com/top250"
 )
 
 // 新增数据
@@ -25,9 +25,9 @@ func Add(movies []parse.DoubanMovie) {
 func Start() {
 	var movies []parse.DoubanMovie
 
-	pages := parse.GetPages(BaseUrl)
+	pages := parse.GetPages(baseUrl)
 	for _, page := range pages {
-		doc := parse.GetDoc(BaseUrl + page.Url)
+		doc := parse.GetDoc(baseUrl + page.Url)
 		movies = append(movies, parse.ParseMovies(doc)...)
 	}
 	Add(movies)
